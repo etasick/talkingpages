@@ -16,27 +16,7 @@ function MyApp({ Component, pageProps }) {
             <Component {...pageProps} />
           </main>
           <Footer />
-          <Script
-            id="zoho-salesiq"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                var $zoho=$zoho||{};$zoho.salesiq=$zoho.salesiq||{
-                  widgetcode:"siq3adb6252a1dd217807cb7b1c9b27174aece2bddd1d28fdfa35dfcda26da26a5c",
-                  values:{},
-                  ready:function(){}
-                };
-                var d=document;
-                s=d.createElement("script");
-                s.type="text/javascript";
-                s.id="zsiqscript";
-                s.defer=true;
-                s.src="https://salesiq.zoho.com/widget";
-                t=d.getElementsByTagName("script")[0];
-                t.parentNode.insertBefore(s,t);
-              `
-            }}
-          />
+          
         </div>
       </HelmetProvider>
     </CartProvider>

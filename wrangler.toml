@@ -1,0 +1,14 @@
+name = "talkingpages"
+compatibility_date = "2024-05-23"
+
+[[r2_buckets]]
+binding = "AUDIO_BUCKET"      # Used in code to access R2
+bucket_name = "storebucket"
+
+[[d1_databases]]
+binding = "DB"          # Used in code to access D1
+database_name = "audio_files"
+database_id = "e4bc9a40-737c-4417-b1f4-d5f4266d61f1"
+
+[[triggers]]
+crons = ["0 */6 * * *"] # every 6 hours
