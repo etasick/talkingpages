@@ -26,8 +26,10 @@ const handleListen = async (target) => {
     if (data.audioUrl) {
       const audio = new Audio(data.audioUrl);
       audio.play();
+      setAudio(audio);
       setAudioUrl(data.audioUrl);
-      setSummary(data.summary);
+      setSummary(data.summary || "No summary available.");
+
     } else {
       alert("Failed to extract audio.");
     }
