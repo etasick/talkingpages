@@ -72,6 +72,8 @@ const handleListen = async (target) => {
           content="TalkingPages enables you to listen to the audio recording of any webpage by simply entering the address."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="https://www.butterflyassets.online/talkingpages_logo.png" />
+
       </Head>
 
       <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-10">
