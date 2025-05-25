@@ -26,10 +26,16 @@ function ContactUs() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <Helmet>
-        <title>Contact</title>
-        <meta name="description" content="contact" />
-      </Helmet>
+      <Head>
+        <meta charSet="utf-8" />
+        <title>Contact | TalkingPages</title>
+        <meta
+          name="description"
+          content="contact Talkingpages for any information you may need about our AI tool."
+        />
+        <link rel="icon" href="https://www.butterflyassets.online/talkingpages_logo.png" />
+
+      </Head>
       <h1 className="text-3xl font-bold mb-4">Contact Us</h1>
       <p className="text-gray-700 mb-6">Have questions or need help? Get in touch with us!</p>
       <form className="space-y-4" onSubmit={handleSubmit}>

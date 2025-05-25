@@ -4,6 +4,12 @@
 export default function TermsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800">
+      <Head>
+        <meta charSet="utf-8" />
+        <title>Terms| TalkingPages</title>
+        <link rel="icon" href="https://www.butterflyassets.online/talkingpages_logo.png" />
+
+      </Head>
       <main className="flex-grow px-6 py-10 max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-6">Terms & Conditions</h1>
 

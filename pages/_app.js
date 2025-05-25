@@ -11,10 +11,7 @@ function MyApp({ Component, pageProps }) {
     <CartProvider>
       <HelmetProvider>
         <div className="container mx-auto">
-          <Head>
-        <link rel="icon" href="https://www.butterflyassets.online/talkingpages_logo.png" />
-        
-      </Head>
+         
           <Header />
           <main>
             <Component {...pageProps} />
