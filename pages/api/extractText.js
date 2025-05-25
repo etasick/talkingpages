@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     const workerResponse = await fetch("https://talkingpages-audio-worker-parser.etasick.workers.dev/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ summary }),
+      body: JSON.stringify({ summary,originalUrl: url }),
     });
 
     if (!workerResponse.ok) {
