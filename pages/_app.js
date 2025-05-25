@@ -11,7 +11,6 @@ function MyApp({ Component, pageProps }) {
     <CartProvider>
       <HelmetProvider>
         <div className="container mx-auto">
-         
           <Header />
           <main>
             <Component {...pageProps} />

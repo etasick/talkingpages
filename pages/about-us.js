@@ -3,17 +3,7 @@
 export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800">
-        <Head>
-        <meta charSet="utf-8" />
-        <title>About us| TalkingPages</title>
-        <meta
-          name="description"
-          content="TalkingPages enables you to listen to the audio recording of any webpage by simply entering the address."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="https://www.butterflyassets.online/talkingpages_logo.png" />
-
-      </Head>
+        
       
       <main className="flex-grow px-6 py-10 max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-4">About Us</h1>
