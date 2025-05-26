@@ -66,11 +66,12 @@ const handleListen = async (target) => {
     <div className="min-h-screen bg-white text-gray-800 flex flex-col">
       <Head>
         <meta charSet="utf-8" />
-        <title>Listen to the audio recording of any webpage | TalkingPages</title>
+        <title>Convert any webpage to an MP3 audio file | TalkingPages</title>
         <meta
           name="description"
-          content="TalkingPages enables you to listen to the audio recording of any webpage by simply entering the address."
+          content="TalkingPages is an AI tool that enables you to convert any web page to high-quality MP3 audio file. You can listen online or download for later use."
         />
+        <meta name="google-site-verification" content="HAxfYe2846r5ZUCHbGqcvp8SYSBhM8gaAQEirXPgjKk" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="https://www.butterflyassets.online/talkingpages_logo.png" />
 
@@ -79,7 +80,7 @@ const handleListen = async (target) => {
       <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-10">
         <h2 className="text-3xl font-semibold mb-2">Welcome to TalkingPages</h2>
         <p className="mb-6 max-w-xl text-lg">
-          We make web pages come alive with the power of AI. Listen to the audio of any web page.
+          Convert any webpage to an MP3 Audio file.
         </p>
 
         <div className="w-full max-w-xl bg-gray-50 p-6 rounded-xl shadow-md">
@@ -97,7 +98,7 @@ const handleListen = async (target) => {
               className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
               disabled={loading}
             >
-              {loading ? "Processing..." : "🎧 Listen to Webpage"}
+              {loading ? "Processing..." : "🎧 Convert to MP3 Audio "}
             </button>
 
             <button

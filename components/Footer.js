@@ -6,27 +6,29 @@ export default function Footer() {
   return (
     <footer className="bg-gray-50 text-sm text-center text-gray-600 py-10 border-t mt-12 px-4">
       <div className="max-w-6xl mx-auto mb-10">
-        <h3 className="text-xl font-bold text-gray-800 mb-2">Welcome to TalkingPages</h3>
-        <p className="mb-6">An AI tool that enables you to listen to web pages.</p>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">Experience the Web Differently</h3>
+        <p className="mb-6">TalkingPages converts webpages into high-quality MP3 audio you can stream or download.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
           <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h4 className="font-semibold text-gray-800 mb-2">Save Time</h4>
-            <p>Don't stress yourself opening a web page without knowing if it interests you.</p>
+            <h4 className="font-semibold text-gray-800 mb-2">Listen Anywhere</h4>
+            <p>Convert articles into audio and take them with you—perfect for commuting or multitasking.</p>
           </div>
 
           <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h4 className="font-semibold text-gray-800 mb-2">Listen First</h4>
-            <p>Listen to a web page to get a summary of what it's all about.</p>
+            <h4 className="font-semibold text-gray-800 mb-2">Quick Summaries</h4>
+            <p>Get a spoken summary before deciding if a page is worth your time.</p>
           </div>
 
           <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h4 className="font-semibold text-gray-800 mb-2">Take It With You</h4>
-            <p>Download the webpage audio and use it whenever it's convenient for you.</p>
+            <h4 className="font-semibold text-gray-800 mb-2">Download & Save</h4>
+            <p>Download the MP3 version of any page and listen offline whenever it’s convenient.</p>
           </div>
         </div>
 
-        <p className="mt-6 text-blue-600 font-semibold">TalkingPages: <span className="italic">Listen before you leap!</span></p>
+        <p className="mt-6 text-blue-600 font-semibold">
+          TalkingPages: <span className="italic">Let the web speak to you.</span>
+        </p>
       </div>
 
       <div className="space-x-2 text-gray-500">
