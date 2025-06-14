@@ -2,52 +2,46 @@
 
 import { useState } from "react";
 import Head from "next/head";
-import NewsSummaries from "@/components/NewsSummaries";
 
 export default function Home() {
-  const [url, setUrl] = useState("");
-  const [summary, setSummary] = useState("");
-  const [fullText, setFullText] = useState("");
-  const [showFull, setShowFull] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [text, setText] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
   const [audio, setAudio] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [audioPlayed, setAudioPlayed] = useState(false);
 
-const handleListen = async (target) => {
-  const targetUrl = typeof target === "string" ? target : url;
-  if (!targetUrl) return alert("Please enter a URL.");
-  setLoading(true);
-  setAudioUrl(null);
-  setSummary(null);
-  try {
-    const response = await fetch(`/api/extractText?url=${encodeURIComponent(targetUrl)}`);
-    const data = await response.json();
-    if (data.audioUrl) {
-      const audio = new Audio(data.audioUrl);
-      audio.play();
-      setAudio(audio);
-      setAudioUrl(data.audioUrl);
-      setSummary(data.summary || "No summary available.");
-
-    } else {
-      alert("Failed to extract audio.");
+  const handleListen = async () => {
+    if (!text) return alert("Please enter some text.");
+    setLoading(true);
+    setAudioUrl(null);
+    try {
+      const response = await fetch("/api/textToSpeech", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+      const data = await response.json();
+      if (data.audioUrl) {
+        const audio = new Audio(data.audioUrl);
+        audio.play();
+        setAudio(audio);
+        setAudioUrl(data.audioUrl);
+        setAudioPlayed(true);
+      } else {
+        alert("Failed to generate audio.");
+      }
+    } catch (error) {
+      console.error("Error generating audio:", error);
+      alert("An error occurred during text-to-speech processing.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching page:", error);
-    alert("Error fetching or processing the page.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
 
   const handleReplay = () => {
     if (audio) {
       audio.currentTime = 0;
       audio.play();
-      setAudioPlayed(false);
     }
   };
 
@@ -66,29 +60,27 @@ const handleListen = async (target) => {
     <div className="min-h-screen bg-white text-gray-800 flex flex-col">
       <Head>
         <meta charSet="utf-8" />
-        <title>Convert any webpage to an MP3 audio file | TalkingPages</title>
+        <title>Convert Text to Speech | TalkingPages</title>
         <meta
           name="description"
-          content="TalkingPages is an AI tool that enables you to convert any web page to high-quality MP3 audio file. You can listen online or download for later use."
+          content="TalkingPages is a powerful AI tool that converts any text into high-quality MP3 audio using advanced TTS technology."
         />
-        <meta name="google-site-verification" content="HAxfYe2846r5ZUCHbGqcvp8SYSBhM8gaAQEirXPgjKk" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="https://www.butterflyassets.online/talkingpages_logo.png" />
-
       </Head>
 
       <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-10">
         <h2 className="text-3xl font-semibold mb-2">Welcome to TalkingPages</h2>
         <p className="mb-6 max-w-xl text-lg">
-          Convert any webpage to an MP3 Audio file.
+          Instantly convert any written text into natural-sounding speech. Ideal for content creators, learners, and productivity.
         </p>
 
         <div className="w-full max-w-xl bg-gray-50 p-6 rounded-xl shadow-md">
-          <input
-            type="url"
-            placeholder="Enter webpage URL..."
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+          <textarea
+            rows={6}
+            placeholder="Enter your text here..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
@@ -98,7 +90,7 @@ const handleListen = async (target) => {
               className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
               disabled={loading}
             >
-              {loading ? "Processing..." : "🎧 Convert to MP3 Audio "}
+              {loading ? "Processing..." : "🎧 Convert to MP3 Audio"}
             </button>
 
             <button
@@ -118,59 +110,6 @@ const handleListen = async (target) => {
               🔁 Replay Audio
             </button>
           )}
-        </div>
-
-
-        {summary && (
-          <div className="mt-8 max-w-2xl text-left bg-gray-100 p-6 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-xl font-semibold">📝 Webpage Summary</h3>
-              <button
-                onClick={() => setShowFull(!showFull)}
-                className="text-blue-600 underline text-sm"
-              >
-                {showFull ? "Show Summary" : "Show Full Text"}
-              </button>
-            </div>
-            <p className="text-gray-700 whitespace-pre-line">
-              {showFull ? fullText || summary : summary}
-            </p>
-          </div>
-        )}
-
-        {/* News Summaries Section */}
-        <div className="mt-12 w-full max-w-5xl px-4">
-          <h3 className="text-2xl font-bold mb-6 text-center">📰 Listen to News Summaries from top sources</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { name: "Forbes", url: "https://forbes.com" },
-              { name: "CNN", url: "https://edition.cnn.com/" },
-              { name: "MSNBC", url: "https://www.msnbc.com/" },
-            ].map((news) => (
-              <div
-                key={news.name}
-                className="bg-gray-50 border p-4 rounded-lg shadow text-center flex flex-col justify-between"
-              >
-                <h4 className="text-lg font-semibold mb-2">{news.name}</h4>
-                <div className="flex flex-col gap-2">
-                  <button
-                    className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-                    onClick={() => handleListen(news.url)}
-                  >
-                    🎧 Listen
-                  </button>
-                  <a
-                    href={news.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    🔗 Visit Site
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </main>
     </div>
