@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-talkingpages-dev-75918-authRole",
+      "UnauthRoleArn": "arn:aws:iam::980921748213:role/amplify-talkingpages-dev-75918-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::980921748213:role/amplify-talkingpages-dev-75918-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-talkingpages-dev-75918-deployment",
+      "UnauthRoleName": "amplify-talkingpages-dev-75918-unauthRole",
+      "StackName": "amplify-talkingpages-dev-75918",
+      "StackId": "arn:aws:cloudformation:us-east-1:980921748213:stack/amplify-talkingpages-dev-75918/37352380-4dc9-11f0-b0f9-0afffe2c6b9b",
+      "AmplifyAppId": "d37av62oyqy0g7"
+    },
+    "categories": {
+      "auth": {
+        "talkingpagesb4f63426": {}
+      },
+      "api": {
+        "talkingpages": {}
+      }
+    }
+  }
+}

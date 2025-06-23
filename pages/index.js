@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
+import { Auth } from 'aws-amplify';
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -9,6 +10,24 @@ export default function Home() {
   const [audio, setAudio] = useState(null);
   const [loading, setLoading] = useState(false);
   const [audioPlayed, setAudioPlayed] = useState(false);
+
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is signed in
+    const checkUser = async () => {
+      try {
+        const currentUser = await Auth.currentAuthenticatedUser();
+        setUser(currentUser);
+      } catch (err) {
+        setUser(null);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+    checkUser();
+  }, []);
 
   const handleListen = async () => {
     if (!text) return alert("Please enter some text.");
@@ -18,7 +37,7 @@ export default function Home() {
       const response = await fetch("/api/textToSpeech", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text }),
       });
       const data = await response.json();
       if (data.audioUrl) {
@@ -68,6 +87,29 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="https://www.butterflyassets.online/talkingpages_logo.png" />
       </Head>
+
+      {/* Account Section */}
+      <header className="w-full bg-gray-100 p-4 flex justify-end items-center text-sm">
+        {authLoading ? (
+          <span>Checking session...</span>
+        ) : user ? (
+          <a
+            href="/account"
+            className="text-blue-600 font-medium hover:underline"
+          >
+            Account Home
+          </a>
+        ) : (
+          <div className="space-x-4">
+            <a href="/signin" className="text-blue-600 font-medium hover:underline">
+              Sign In
+            </a>
+            <a href="/signup" className="text-blue-600 font-medium hover:underline">
+              Sign Up
+            </a>
+          </div>
+        )}
+      </header>
 
       <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-10">
         <h2 className="text-3xl font-semibold mb-2">Welcome to TalkingPages</h2>

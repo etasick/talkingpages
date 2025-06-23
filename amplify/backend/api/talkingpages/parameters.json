@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "talkingpages",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authtalkingpagesb4f63426",
+      "Outputs.UserPoolId"
+    ]
+  }
+}
