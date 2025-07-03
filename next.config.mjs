@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["www.butterflyassets.online"],
+    domains: ["www.butterflyassets.online","proprimemart.com"],
   }
 };
 

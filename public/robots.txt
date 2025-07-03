@@ -1,4 +1,9 @@
+# *
 User-agent: *
-Disallow:
+Allow: /
 
-Sitemap: https://vendprosupply.com/sitemap.xml
+# Host
+Host: https://www.talkingpages.io
+
+# Sitemaps
+Sitemap: https://www.talkingpages.io/sitemap.xml

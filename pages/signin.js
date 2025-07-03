@@ -1,165 +1,152 @@
 'use client';
 import { useState } from 'react';
+import { signIn } from 'aws-amplify/auth';
 import { useRouter } from 'next/navigation';
-import { Auth } from '@aws-amplify/auth';
-import { Amplify } from 'aws-amplify';
-import awsExports from '../src/aws-exports'; 
-
-
 
 export default function SignIn() {
   const router = useRouter();
-
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [isOtpRequired, setIsOtpRequired] = useState(false);
 
   const handleSignIn = async () => {
-    if (!phoneNumber || !password) {
-      setErrorMsg('Phone and Password required');
-      return;
-    }
-
     setIsLoading(true);
     setErrorMsg('');
-    try {
-      const phone = '+237' + phoneNumber.trim();
 
-      const signInResult = await Auth.signIn({
-        username: phone,
-        password: password,
+    try {
+      const { isSignedIn, nextStep } = await signIn({
+        username: email,
+        password,
       });
 
-      if (signInResult.isSignedIn) {
-        // success
-        router.push('/home');
+      console.log('Sign in result:', { isSignedIn, nextStep });
+
+      if (isSignedIn) {
+        router.push('/');
       } else {
-        handleSignInStep(signInResult.nextStep?.signInStep);
+        console.log('Next step:', nextStep);
       }
     } catch (err) {
-      console.error('SignIn error:', err);
-      setErrorMsg(formatError(err.message));
-    }
-    setIsLoading(false);
-  };
-
-  const formatError = (message) => {
-    if (message.includes('UserNotFoundException')) return 'Account not found';
-    if (message.includes('NotAuthorizedException')) return 'Incorrect password';
-    if (message.includes('UserNotConfirmedException')) return 'Please verify your phone first';
-    return `Sign-in failed: ${message}`;
-  };
-
-  const handleSignInStep = (step) => {
-    console.log('Next step:', step);
-    switch (step) {
-      case 'CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE':
-        setIsOtpRequired(true);
-        break;
-      case 'DONE':
-        router.push('/home');
-        break;
-      default:
-        setErrorMsg('Unexpected sign-in step');
-    }
-  };
-
-  const handleConfirmOtp = async () => {
-    if (!otpCode) {
-      setErrorMsg('Enter OTP code');
-      return;
+      console.error('Sign in error:', err);
+      setErrorMsg(err.message || 'Sign in failed');
     }
 
-    setIsLoading(true);
-    setErrorMsg('');
-    try {
-      const result = await Auth.confirmSignIn(otpCode.trim());
-      if (result.isSignedIn) {
-        router.push('/home');
-      }
-    } catch (err) {
-      console.error('Confirm error:', err);
-      setErrorMsg(err.message || 'Verification failed');
-    }
     setIsLoading(false);
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen px-4 bg-gradient-to-b from-blue-600 to-purple-700">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-center mb-6">Secure Sign In</h1>
-
-        {errorMsg && (
-          <div className="bg-red-100 text-red-600 p-2 rounded mb-4 text-center">
-            {errorMsg}
+    <div className="min-h-screen bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 w-16 h-16 rounded-lg flex items-center justify-center">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
           </div>
-        )}
+        </div>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+          Sign in to your account
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-400 max-w">
+          Secure access to your AI voice tools
+        </p>
+      </div>
 
-        {!isOtpRequired ? (
-          <>
-            <label className="block mb-2">Phone Number (+237)</label>
-            <input
-              type="tel"
-              className="border p-2 w-full mb-4 rounded"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="6XXXXXXXX"
-            />
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-gray-800 py-8 px-4 shadow-xl rounded-lg sm:px-10 border border-gray-700">
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-900/30 border border-red-700 text-red-300 rounded-md text-sm">
+              {errorMsg}
+            </div>
+          )}
 
-            <label className="block mb-2">Password</label>
-            <input
-              type="password"
-              className="border p-2 w-full mb-4 rounded"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-
-            <div className="flex justify-end mb-4">
-              <a href="/forgot-password" className="text-blue-600 text-sm underline">
-                Forgot Password?
-              </a>
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                Email address
+              </label>
+              <div className="mt-1">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 text-white"
+                />
+              </div>
             </div>
 
-            <button
-              onClick={handleSignIn}
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            >
-              {isLoading ? 'Signing In...' : 'Sign In'}
-            </button>
-          </>
-        ) : (
-          <>
-            <label className="block mb-2">SMS Verification Code</label>
-            <input
-              type="text"
-              className="border p-2 w-full mb-4 rounded"
-              value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value)}
-              placeholder="Enter code"
-            />
+            <div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                  Password
+                </label>
+                <div className="text-sm">
+                  <a href="/forgot-password" className="font-medium text-blue-400 hover:text-blue-300 transition">
+                    Forgot password?
+                  </a>
+                </div>
+              </div>
+              <div className="mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 text-white"
+                />
+              </div>
+            </div>
 
-            <button
-              onClick={handleConfirmOtp}
-              disabled={isLoading}
-              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-            >
-              {isLoading ? 'Verifying...' : 'Verify Code'}
-            </button>
-          </>
-        )}
+            <div>
+              <button
+                onClick={handleSignIn}
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-opacity"
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Signing in...
+                  </>
+                ) : 'Sign in'}
+              </button>
+            </div>
+          </div>
 
-        <div className="mt-6 text-center">
-          <span className="text-gray-600">New user? </span>
-          <a href="/signup" className="text-blue-600 underline font-semibold">
-            Create Account
-          </a>
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-gray-800 text-gray-400">
+                  Don't have an account?
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <a
+                href="/signup"
+                className="w-full flex justify-center py-3 px-4 border border-gray-700 rounded-lg shadow-sm text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+              >
+                Create account
+              </a>
+            </div>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

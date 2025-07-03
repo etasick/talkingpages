@@ -1,97 +1,54 @@
 'use client';
 import { useState } from 'react';
+import { resetPassword, confirmResetPassword } from 'aws-amplify/auth';
 import { useRouter } from 'next/navigation';
-import { Auth } from '@aws-amplify/auth';
-import { Amplify } from 'aws-amplify';
-import awsExports from '../src/aws-exports'; // adjust path
 
 export default function ForgotPassword() {
   const router = useRouter();
-
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [code, setCode] = useState('');
+  const [otpCode, setOtpCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
-
-  const [showUsername, setShowUsername] = useState(false);
-  const [codeSent, setCodeSent] = useState(false);
+  const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-
-  const handleEmailSubmit = async () => {
-    if (!email) {
-      setErrorMsg('Enter your email');
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMsg('');
-
-    try {
-      // Example: your API endpoint for lookup
-      const response = await fetch(
-        'https://p4l8c7wl87.execute-api.us-east-1.amazonaws.com/default/userbyemail',
-        {
-          method: 'POST',
-          body: JSON.stringify({ email }),
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok && data?.username) {
-        setUsername(data.username);
-        setShowUsername(true);
-      } else {
-        setErrorMsg('No account found with this email');
-      }
-    } catch (err) {
-      console.error('Lookup error:', err);
-      setErrorMsg('Failed to look up account');
-    }
-
-    setIsLoading(false);
-  };
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleSendResetCode = async () => {
-    if (!username) {
-      setErrorMsg('Username is required');
-      return;
-    }
-
     setIsLoading(true);
     setErrorMsg('');
+    setSuccessMsg('');
 
     try {
-      await Auth.resetPassword({ username });
-      setCodeSent(true);
+      const { nextStep } = await resetPassword({ username: email });
+      console.log('Reset code sent:', nextStep);
+      setStep(2);
+      setSuccessMsg('A reset code has been sent to your email.');
     } catch (err) {
-      console.error('Reset error:', err);
-      setErrorMsg(err.message || 'Failed to initiate reset');
+      console.error('Reset password error:', err);
+      setErrorMsg(err.message || 'Failed to send reset code');
     }
 
     setIsLoading(false);
   };
 
   const handleConfirmReset = async () => {
-    if (!code || !newPassword) {
-      setErrorMsg('Enter code and new password');
-      return;
-    }
-
     setIsLoading(true);
     setErrorMsg('');
+    setSuccessMsg('');
 
     try {
-      await Auth.confirmResetPassword({
-        username,
-        confirmationCode: code.trim(),
-        newPassword: newPassword.trim(),
+      await confirmResetPassword({
+        username: email,
+        confirmationCode: otpCode.trim(),
+        newPassword,
       });
 
-      alert('Password reset successfully!');
-      router.push('/signin');
+      console.log('Password reset complete');
+      setSuccessMsg('Password reset successful! Redirecting to sign in...');
+      setTimeout(() => {
+        router.push('/signin');
+      }, 2000);
+
     } catch (err) {
       console.error('Confirm reset error:', err);
       setErrorMsg(err.message || 'Failed to reset password');
@@ -101,84 +58,156 @@ export default function ForgotPassword() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen px-4 bg-gradient-to-b from-blue-600 to-purple-700">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-center mb-6">Password Recovery</h1>
-
-        {errorMsg && (
-          <div className="bg-red-100 text-red-600 p-2 rounded mb-4 text-center">
-            {errorMsg}
+    <div className="min-h-screen bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 w-16 h-16 rounded-lg flex items-center justify-center">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
           </div>
-        )}
+        </div>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+          Reset your password
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-400">
+          Secure access to your AI voice tools
+        </p>
+      </div>
 
-        {!codeSent ? (
-          <>
-            <label className="block mb-2">Email</label>
-            <input
-              type="email"
-              className="border p-2 w-full mb-4 rounded"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-            />
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-gray-800 py-8 px-4 shadow-xl rounded-lg sm:px-10 border border-gray-700">
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-900/30 border border-red-700 text-red-300 rounded-md text-sm">
+              {errorMsg}
+            </div>
+          )}
+          
+          {successMsg && (
+            <div className="mb-4 p-3 bg-green-900/30 border border-green-700 text-green-300 rounded-md text-sm">
+              {successMsg}
+            </div>
+          )}
 
-            {showUsername && (
-              <>
-                <label className="block mb-2">Username</label>
-                <input
-                  type="text"
-                  className="border p-2 w-full mb-4 rounded"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Username"
-                />
-              </>
-            )}
+          {step === 1 ? (
+            <div className="space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                  Email address
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 text-white"
+                  />
+                </div>
+              </div>
 
-            <button
-              onClick={showUsername ? handleSendResetCode : handleEmailSubmit}
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            >
-              {isLoading ? 'Processing...' : showUsername ? 'Send Reset Code' : 'Continue'}
-            </button>
-          </>
-        ) : (
-          <>
-            <label className="block mb-2">Verification Code</label>
-            <input
-              type="text"
-              className="border p-2 w-full mb-4 rounded"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="Enter code"
-            />
+              <div>
+                <button
+                  onClick={handleSendResetCode}
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-opacity"
+                >
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending Code...
+                    </>
+                  ) : 'Send Reset Code'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div>
+                <label htmlFor="otpCode" className="block text-sm font-medium text-gray-300 mb-1">
+                  Verification Code
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="otpCode"
+                    name="otpCode"
+                    type="text"
+                    required
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    placeholder="Enter code from email"
+                    className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 text-white"
+                  />
+                </div>
+              </div>
 
-            <label className="block mb-2">New Password</label>
-            <input
-              type="password"
-              className="border p-2 w-full mb-4 rounded"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="New password"
-            />
+              <div>
+                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                  New Password
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="newPassword"
+                    name="newPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 text-white"
+                  />
+                </div>
+              </div>
 
-            <button
-              onClick={handleConfirmReset}
-              disabled={isLoading}
-              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-            >
-              {isLoading ? 'Resetting...' : 'Reset Password'}
-            </button>
-          </>
-        )}
+              <div>
+                <button
+                  onClick={handleConfirmReset}
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-green-600 to-teal-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-opacity"
+                >
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Resetting Password...
+                    </>
+                  ) : 'Reset Password'}
+                </button>
+              </div>
+            </div>
+          )}
 
-        <div className="mt-6 text-center">
-          <a href="/signin" className="text-blue-600 underline font-semibold">
-            Back to Sign In
-          </a>
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-gray-800 text-gray-400">
+                  Remember your password?
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <a
+                href="/signin"
+                className="w-full flex justify-center py-3 px-4 border border-gray-700 rounded-lg shadow-sm text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+              >
+                Sign In
+              </a>
+            </div>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
